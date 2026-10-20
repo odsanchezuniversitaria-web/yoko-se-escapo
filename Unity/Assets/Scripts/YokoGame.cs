@@ -7,6 +7,7 @@ namespace Yoko
         public GameSession Session=new GameSession();
         public ScreenState State {get;private set;}
         public YokoMotor Player;public Camera Cam;public GameUI UI;public Soundscape Sound;
+        public MotionFX FX;public StoryDirector Story;
         public WorldFactory World=new WorldFactory();
         public SaveData CheckpointData=new SaveData();
         public string HintText="";public float HintUntil;
@@ -29,9 +30,10 @@ namespace Yoko
             Cam.orthographic=true;Cam.orthographicSize=5.1f;Cam.backgroundColor=new Color(.07f,.1f,.12f);Cam.clearFlags=CameraClearFlags.SolidColor;Cam.nearClipPlane=.1f;Cam.farClipPlane=100;
             camObj.AddComponent<AudioListener>();Cam.transform.position=new Vector3(10,3.2f,-20);
             var light=new GameObject("Directional Light").AddComponent<Light>();light.type=LightType.Directional;light.intensity=.6f;
+            FX=gameObject.AddComponent<MotionFX>();FX.Setup();
             Player=new GameObject("Yoko").AddComponent<YokoMotor>();Player.Setup();
             Sound=gameObject.AddComponent<Soundscape>();Sound.Setup();
-            UI=gameObject.AddComponent<GameUI>();UI.Setup(Cam);
+            UI=gameObject.AddComponent<GameUI>();UI.Setup(Cam);Story=gameObject.AddComponent<StoryDirector>();
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             gameObject.AddComponent<DebugManager>();
 #endif
@@ -48,7 +50,7 @@ namespace Yoko
             if(State==ScreenState.Playing)
             {
                 Session.Tick(Time.deltaTime);attackCooldown=Mathf.Max(0,attackCooldown-Time.deltaTime);
-                World.Tick(Time.deltaTime);
+                World.Tick(Time.deltaTime);Story.Tick();
                 if(Session.Frenzy)Sound.Threat=1;
                 else Sound.Threat=Session.Data.zone*.16f;
             }
@@ -66,28 +68,29 @@ namespace Yoko
             if(State==ScreenState.Playing)
             {
                 float half=Cam.orthographicSize*Cam.aspect;
-                Vector3 target=new Vector3(Mathf.Clamp(Player.transform.position.x+3,half,World.Length-half),Mathf.Max(3.2f,Player.transform.position.y+1),-20);
-                Cam.transform.position=Vector3.Lerp(Cam.transform.position,target,1-Mathf.Exp(-Time.deltaTime*5));
+                Vector3 target=new Vector3(Mathf.Clamp(Player.transform.position.x+Player.Facing*2.3f,half,World.Length-half),Mathf.Max(2.45f,Player.transform.position.y+1),-20);
+                Cam.transform.position=Vector3.Lerp(Cam.transform.position,target,1-Mathf.Exp(-Time.deltaTime*6));
+                Cam.transform.position+=FX.CameraOffset();
             }
         }
         public int PrologueBeat=>prologueBeat;
         public void Title()
         {
-            Time.timeScale=1;World.Build(1);World.Presentation();Player.Warp(new Vector2(8,.2f));
+            Time.timeScale=1;FX.Clear();World.Build(1);World.Presentation();Player.Warp(new Vector2(8,.2f));
             Cam.transform.position=new Vector3(12,3.2f,-20);Player.Visual.sprite=ArtLibrary.Yoko(0);
             ChangeState(ScreenState.Title);
         }
-        public void NewGame(){GodMode=false;TestMode=false;Session=new GameSession();prologueTimer=0;prologueBeat=0;World.Build(1);World.Add(ActorKind.Yimmy,10,0);ChangeState(ScreenState.Prologue);}
+        public void NewGame(){FX.Clear();GodMode=false;TestMode=false;Session=new GameSession();prologueTimer=0;prologueBeat=0;World.Build(1);World.Add(ActorKind.Yimmy,10,0);ChangeState(ScreenState.Prologue);}
         public void BeginCampaign(){Session=new GameSession();GoZone(0);}
         public void ContinueGame(){GodMode=false;TestMode=false;if(Saves.TryRead(out SaveData data)){Session.Restore(data);LoadZone(data.zone,false);}else Hint("No hay una partida válida guardada.",3);}
         public void GoZone(int zone){Session.Data.zone=Mathf.Clamp(zone,0,4);LoadZone(zone,true);}
         void LoadZone(int zone,bool save)
         {
-            World.Build(zone);Session.Health=3;Session.Power=Mutation.None;Session.PowerLeft=0;
+            FX.Clear();World.Build(zone);Story.ResetZone(zone);Session.Health=3;Session.Power=Mutation.None;Session.PowerLeft=0;
             Player.Warp(new Vector2(2,.2f));Player.ClearInput();Cam.transform.position=new Vector3(9,3.2f,-20);
             CheckpointData=Session.Data.Copy();if(save&&!TestMode&&!Saves.Write(CheckpointData))Hint("No se pudo guardar. Revisa el espacio disponible.",6);
             ChangeState(ScreenState.Playing);
-            if(zone==0)Hint("A / D mover · Espacio saltar · E explorar · Shift olfato",7);
+            if(zone==0)Hint("Busca la luz del suero. Olfato revela lo que los ojos no ven.",6);
             else if(zone==1)Hint("Mantén Olfato para reconocer el rastro.",4);
         }
         public void Checkpoint(){CheckpointData=Session.Data.Copy();if(!TestMode&&!Saves.Write(CheckpointData))Hint("No se pudo guardar.",4);}
@@ -112,8 +115,8 @@ namespace Yoko
         public void Interact(){Nearest()?.Interact();}
         public void Attack()
         {
-            if(attackCooldown>0||Player.Sniffing)return;
-            attackCooldown=.5f;Sound.Cue(210,.07f);
+            if(State!=ScreenState.Playing||attackCooldown>0||Player.Sniffing)return;
+            attackCooldown=.34f;Player.AttackPose=.22f;Sound.Play(SoundKind.Slash);FX.Slash(Player.transform.position+Vector3.up*.8f,Player.Facing,Session.Power==Mutation.Claw);
             foreach(var a in World.Actors)
             {
                 if(!a.gameObject.activeSelf)continue;
@@ -123,8 +126,8 @@ namespace Yoko
         }
         public void Hurt()
         {
-            if(GodMode||State!=ScreenState.Playing||Time.time<Player.HurtUntil)return;
-            Session.Health--;Session.Stress=Mathf.Min(100,Session.Stress+32);Player.HurtUntil=Time.time+1.4f;Sound.Cue(330,.22f);
+            if(GodMode||State!=ScreenState.Playing||Player.Dodging||Time.time<Player.HurtUntil)return;
+            Session.Health--;Session.Stress=Mathf.Min(100,Session.Stress+32);Player.HurtUntil=Time.time+1.4f;Sound.Play(SoundKind.Hurt);FX.Shake(.18f);FX.Burst(Player.transform.position+Vector3.up*.6f,new Color(1,.35f,.4f),12,2);Player.Body.linearVelocity=new Vector2(-Player.Facing*4,4);
             if(Session.Health<=0)Die();
         }
         public void Die(){if(GodMode){Player.Warp(new Vector2(2,.2f));return;}ChangeState(ScreenState.Dead);}
@@ -135,6 +138,7 @@ namespace Yoko
             Player.Warp(new Vector2(59,.1f));Cam.transform.position=new Vector3(56,3.2f,-20);
             World.Tick(0);ChangeState(ScreenState.Ending);Sound.Cue(Session.Tragic?85:660,1);
         }
+        void OnApplicationFocus(bool focus){if(!focus&&State==ScreenState.Playing)ChangeState(ScreenState.Pause);}
         void OnApplicationPause(bool pause){if(pause&&State==ScreenState.Playing)ChangeState(ScreenState.Pause);}
         void OnDestroy(){Time.timeScale=1;if(Instance==this)Instance=null;}
     }

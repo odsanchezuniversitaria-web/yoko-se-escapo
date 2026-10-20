@@ -9,21 +9,25 @@ namespace Yoko
         public readonly List<WorldActor> Actors=new List<WorldActor>();
         readonly List<SpriteRenderer> scent=new List<SpriteRenderer>();
         readonly List<SpriteRenderer> spores=new List<SpriteRenderer>();
-        Transform backdrop;
+        Transform backdrop;readonly List<Transform> silhouettes=new List<Transform>();
         public float Length=58;
         public int Zone;
         readonly Color ink=new Color(.08f,.11f,.13f),rose=new Color(.83f,.24f,.40f),gold=new Color(.92f,.76f,.34f);
         public void Build(int zone)
         {
             if(Root!=null){Root.gameObject.SetActive(false);Object.Destroy(Root.gameObject);}
-            Actors.Clear();scent.Clear();spores.Clear();Zone=zone;
+            Actors.Clear();scent.Clear();spores.Clear();silhouettes.Clear();Zone=zone;
             Root=new GameObject("Zone "+zone).transform;
             Length=zone==4?64:58;
             backdrop=ArtLibrary.Draw("Bogota panorama",ArtLibrary.Background,new Vector2(14,-3),new Vector2(42,21),zone==0?new Color(.38f,.48f,.52f):zone>=3?new Color(.64f,.45f,.53f):Color.white,-100,Root).transform;
             Platform(Length/2,-.75f,Length+4,1.5f);
             // Traverseable platforms with a lower exploration route and upper short route.
             Platform(11,1.1f,5,.45f);Platform(19,2.3f,4,.45f);
-            Platform(28,1.3f,5,.45f);Platform(39,2.2f,5,.45f);Platform(49,1.1f,4,.45f);
+            Platform(28,zone==2?2:1.3f,zone==1?7:5,.45f);Platform(39,zone==3?1.6f:2.2f,5,.45f);Platform(49,1.1f,4,.45f);
+            if(zone==1||zone==3)Platform(33,3.1f,3,.4f);
+            if(zone>=1){foreach(float x in new[]{27f,41f}){var vent=new GameObject("Spore vent").AddComponent<SporeVent>();vent.transform.SetParent(Root);vent.transform.position=new Vector2(x,.12f);vent.Offset=x;vent.Setup();}}
+            for(int i=0;i<16;i++){float x=i*5;var r=ArtLibrary.Box("Distant silhouette",new Vector2(x,3),new Vector2(2.6f,6+Mathf.Sin(i)*2),new Color(.06f,.1f,.13f,.25f),-70,Root);silhouettes.Add(r.transform);}
+
             if(zone==0)
             {
                 for(int i=0;i<6;i++)
@@ -103,7 +107,8 @@ namespace Yoko
         {
             var g=YokoGame.Instance;
             backdrop.position=new Vector3(9+g.Cam.transform.position.x*.65f,-3,0);
-            for(int i=0;i<scent.Count;i++)scent[i].enabled=g.Player.Sniffing;
+            for(int i=0;i<scent.Count;i++){scent[i].enabled=g.Player.Sniffing;scent[i].color=new Color(.95f,.82f,.35f,.45f+.4f*Mathf.Sin(Time.time*5-i*.45f));}
+            for(int i=0;i<silhouettes.Count;i++)silhouettes[i].position=new Vector3(i*5+g.Cam.transform.position.x*.12f,3,0);
             for(int i=0;i<spores.Count;i++){var t=spores[i].transform;t.position+=new Vector3(Mathf.Sin(Time.time*.25f+i)*dt*.12f,dt*.1f,0);if(t.position.y>9)t.position=new Vector3(t.position.x,0,0);}
         }
         public int RemainingNodes {get {int n=0;foreach(var a in Actors)if(a.Kind==ActorKind.Node&&!a.Used)n++;return n;}}

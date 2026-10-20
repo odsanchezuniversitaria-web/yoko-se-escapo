@@ -1,0 +1,4 @@
+using UnityEditor;using UnityEngine;namespace Yoko.Editor { public static class YokoPolishView {
+[MenuItem("Yoko/MCP/Showcase")] public static void Show(){var g=YokoGame.Instance;g.TestMode=true;g.GodMode=true;g.Session.Data.serum=true;g.GoZone(1);g.Session.Assimilate(Mutation.Wing,false);g.Player.Warp(new Vector2(20,3));g.Player.AutoInput=true;g.Player.AutoGlide=true;PlayerPrefs.SetInt("yoko-touch",1);g.ChangeState(ScreenState.Playing);g.Story.Say("La patineta dejó una marca. Yoko reconoce el camino.",15);g.FX.Ring(new Vector2(20,4),new Color(.5f,1,.9f),3);}
+[MenuItem("Yoko/Version 0.2")] public static void Version(){PlayerSettings.bundleVersion="0.2.0";PlayerSettings.Android.bundleVersionCode=2;}
+}}

@@ -29,6 +29,12 @@ play.onclick=()=>{if(instance){canvas.focus();return;}play.disabled=true;statusT
 document.querySelector('#full').onclick=()=>{if(instance)instance.SetFullscreen(1);else document.querySelector('#stage').requestFullscreen?.();};
 canvas.addEventListener('click',()=>canvas.focus());canvas.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();});
 </script></body></html>'''
-for key,value in [('LOADER',loader),('DATA',data),('FRAMEWORK',framework),('WASM',wasm)]:html=html.replace('__'+key+'__',value)
+html=html.replace("productVersion:'0.1.0'","productVersion:'0.2.0'")
+html=html.replace('Primera versión jugable ·','Versión 0.2 · Joystick, esquiva, música y nuevos encuentros ·')
+html=html.replace('<kbd>J</kbd>: atacar ·','<kbd>J</kbd>: atacar · <kbd>K</kbd>: esquivar ·')
+html=html.replace('Encuentra el suero y después el ave muerta para salir de la base.','Suelta Salto antes para un salto corto. Esquiva los ataques y espera a que se apaguen las esporas. Encuentra el suero y después el ave muerta para salir de la base.')
+html=html.replace('instala el APK para usar los controles táctiles','instala el APK para usar el joystick y los botones multitáctiles')
+html=html.replace('decide cómo sobrevivir. Tus decisiones cambian el final.','esquiva a los Slays y sigue los recuerdos de Yimmy. Tus decisiones cambian el final.')
+for key,value in [('LOADER',loader),('DATA',data),('FRAMEWORK',framework),('WASM',wasm)]:html=html.replace('__'+key+'__',value+'?v=0.2.0')
 (site/'index.html').write_text(html,encoding='utf-8')
 print('Web preparada:',[(p.name,p.stat().st_size) for p in (site/'Build').iterdir()])

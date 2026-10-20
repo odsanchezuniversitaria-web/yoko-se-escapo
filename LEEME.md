@@ -2,6 +2,8 @@
 
 Primera versión jugable 2D para Windows y Android, creada con Unity **6000.4.10f1** a partir de la Biblia Narrativa suministrada. Campaña compacta de cinco zonas: base, ciudad, encuentro con Yimmy, epicentro y núcleo.
 
+Actualización **0.2**: joystick analógico, botones multitáctiles, esquiva, salto variable, efectos de combate, música ambiental, peligros de esporas y objetivos narrativos durante la partida. Detalles en `docs/08-mejoras-v02.md`.
+
 ## Jugar
 
 Windows: abrir `Builds/Windows/Yoko.exe`. Mantener el ejecutable junto a Yoko_Data, UnityPlayer.dll y las demás carpetas del build. El ZIP de Windows contiene el conjunto completo.
@@ -18,11 +20,14 @@ Android: el archivo de entrega es `Builds/Android/Yoko.apk`, destinado a Android
 | Olfato | Mantener Shift | Mantener Olfato |
 | Interactuar / asimilar | E | Explorar |
 | Atacar / romper micelio con fuerza | J | Acción |
+| Esquivar | K o Ctrl izquierdo | Esquiva |
 | Pausa | Escape | II |
 
 El suero de la base habilita Quimera. Busca el ave muerta y usa los saltos con planeo para salir. Las mutaciones duran 35 segundos. Los restos reaparecen; las presas vivas aumentan la violencia. El olfato revela el rastro y reduce la velocidad. Los enemigos anuncian el ataque en rojo: puedes evadirlos. En el núcleo, rompe los tres nodos con Quimera de fuerza y acércate a Yimmy.
 
 El valor de violencia se consulta solo en Pausa > Configuración. El daño se comunica con la postura de Yoko; no hay barra de vida. El juego guarda al comenzar cada zona y al encontrar a Yimmy. Continuar carga ese punto; Reintentar restaura el último refugio. Se puede silenciar el sonido y activar controles táctiles en PC desde Configuración.
+
+El joystick permite caminar despacio o correr. Mantén Salto para ganar altura; suéltalo antes para un salto corto. La esquiva evita el daño durante su impulso y necesita 1,1 segundos para recuperarse. Los círculos de esporas avisan antes de activarse: espera, salta por encima o usa la ruta elevada.
 
 ## Editar en Unity
 
