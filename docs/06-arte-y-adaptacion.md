@@ -1,0 +1,29 @@
+# Arte y adaptación
+
+Sprites finales en Unity/Assets/Resources/Art/. Generados con la herramienta integrada image_gen, sin CLI ni claves API. No son calcos ni originales extraídos del PDF: son interpretaciones guiadas por sus referencias. Se preservan raza, pelaje, collar y placa de Yoko; cabello, gafas, saco SKATE, pantalón y patineta de Yimmy; siluetas y garras de Slays. Recortes del atlas efectuados por Unity sin modificar los archivos de imagen originales.
+
+## Prompts utilizados
+
+### Yoko.png — referencia página 7
+
+Create production Unity 2D game sprite sheet, character Yoko, faithfully matching the reference dog: miniature pinscher charcoal black fur, tan eyebrow patches, tan muzzle/chest/legs, naturally folded ears, yellow collar with small round gold tag, expressive vulnerable little dog. Hand drawn clean dark outlined cel shaded style exactly like reference. Transparent background. Landscape canvas 1536x1024 organized in exact 3 columns x 2 rows of equally sized cells. Each of SIX cells contains ONE full-body dog entirely within cell with generous transparent padding, all facing RIGHT in strict side view, same dog size and baseline. Top row: idle standing, running contact frame, running flying frame. Bottom row: jumping with paws tucked, sniffing with nose down and ears low, hurt/cowering with one paw lifted. No writing, no sheet labels, no backgrounds, no ground, no extra characters. Keep anatomy quadrupedal and consistent. This is a sprite atlas sliced by equal cells.
+
+### Cast.png — referencias páginas 10 y 12
+
+Production game sprite atlas on truly transparent background. Exact 4 columns by 2 rows grid, square canvas 1536x1536. EIGHT equal square cells, full characters isolated with padding, no text labels. Hand drawn cel shaded with strong dark outlines consistent with reference comic illustrations. Top row four sprites of Yimmy matching reference 1 exactly: slim young man black swept hair, square black glasses, GREEN hoodie with yellow word SKATE, black cargo pants with straps, black skate shoes. Facing left side/three-quarter. Cells: standing holding skateboard; seated injured supporting himself; standing reunited calmly; empty skateboard lying horizontally (only skateboard). Bottom row: ONE thin tall Slay monster as in reference 2, pale cadaver skin, exposed jaw, elongated claws, subtle pink fungal veins facing left; ONE crouched Slay same design facing left; ONE giant bulkier hybrid Slay boss with pink mycelium claws facing left; ONE frightened hostile adult survivor in gray worn clothing holding a wooden stick facing left. Everything fully inside cell and separate, no overlaps, no scenery, no ground or shadows, preserve genuine transparent alpha.
+
+Resultado: 1254×1254; las celdas no resultaron uniformes y se configuraron rectángulos específicos en ArtLibrary.
+
+### Bogota.png
+
+Use case illustration-story. Asset type panoramic background for a 2D side scrolling illustrated survival game Yoko se escapó. 1536x1024 landscape. South Bogota Colombia after space station wreck impact: layers of dense brick and concrete working class neighborhoods climbing the Andes mountain slopes, damaged overhead cables, cracked houses, distant red bus, rubble and abandoned street. Muted charcoal teal gray atmosphere and rusty ochre buildings, selective crimson pink fungal mycelium running on masonry, a glowing pink fungal impact crater far right. Gorgeous hand drawn graphic novel environment with bold silhouettes, atmospheric depth, intricate architecture and fog. Side-on street-level view, no strong perspective road vanishing point, lower quarter dark pavement and rubble, upper half dramatic gray cloudy sky with tiny distant burning debris. No people, no dogs, no monsters, no interface, no words. Readable background that will sit behind bright game character sprites. Wide establishing shot, moody cinematic daylight, beautiful restrained palette.
+
+### Props.png
+
+Create a clean 2D side scrolling graphic-novel game prop sprite atlas. TRUE transparent background. 1536x1024 landscape with EXACTLY 4 equally spaced columns and 2 equal rows, each of 8 cells isolated with padding, no overlap. Same dark bold ink outlined cel-shaded graphic novel style, muted realistic colors with pink fungus accents. Top row left to right: small deceased gray pigeon lying on side with closed eye (non graphic), small living gray pigeon standing side-on, small heap of old animal bones with pink fungal tissue, small living brown rat standing side-on. Bottom row: glowing cyan experimental serum vial glass bottle on its side; folded yellowed research notes paper with tiny indistinct line marks no readable writing; tall organic red pink mycelium node with tendrils rooted at bottom; horizontal ruined concrete platform slab with rusty rebar and dark cracked face. Each entire object confined within its cell. No backdrop, no labels, no floor shadows, genuinely transparent alpha, consistent scale within categories. These are game sprites, not a poster.
+
+## Alcance de esta versión
+
+Campaña compacta jugable con cinco zonas construidas por código, un panorama reutilizado con variaciones, plataformas, enemigos y dos desenlaces. Animación de Yoko por cambio de poses y movimiento corporal; enemigos y NPC usan poses con movimiento procedural. Quimera implementa planeo y fuerza temporal, sin un juego completo de animaciones de transformación. Prólogo y finales usan viñetas y texto ambiental; no hay escenas cinematográficas completas. Sonido ambiental sintetizado y señales, no banda sonora ni doblaje profesional.
+
+El PDF es una Biblia narrativa, no un GDD completo: no especifica duración, mapas, balance, lista exhaustiva de poderes ni diálogos de cada escena. Estas decisiones son adaptaciones documentadas, manteniendo a Yoko como única jugable y a Yimmy como objetivo de rescate.

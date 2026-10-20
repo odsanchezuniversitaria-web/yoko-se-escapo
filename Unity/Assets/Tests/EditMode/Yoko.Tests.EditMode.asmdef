@@ -1,0 +1,1 @@
+{"name":"Yoko.Tests.EditMode","references":["Yoko.Runtime"],"includePlatforms":["Editor"],"optionalUnityReferences":["TestAssemblies"]}

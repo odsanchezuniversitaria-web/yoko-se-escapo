@@ -1,0 +1,1 @@
+{"name":"Yoko.Editor","references":["Yoko.Runtime","UnityEditor.TestRunner","UnityEngine.TestRunner"],"includePlatforms":["Editor"]}
