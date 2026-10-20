@@ -1,0 +1,34 @@
+from pathlib import Path
+import shutil
+
+root=Path(__file__).resolve().parents[1]
+build=root/'Builds/WebGL'
+site=root/'site'
+site.mkdir(exist_ok=True)
+shutil.copytree(build/'Build',site/'Build',dirs_exist_ok=True)
+shutil.copy(root/'Preview/Titulo.png',site/'portada.png')
+(site/'.nojekyll').write_text('')
+loader=next((site/'Build').glob('*.loader.js')).name
+data=next((site/'Build').glob('*.data')).name
+framework=next((site/'Build').glob('*.framework.js')).name
+wasm=next((site/'Build').glob('*.wasm')).name
+html='''<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d181b"><title>Yoko se escapó · Juega ahora</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#091315;color:#f0eedc;font-family:system-ui,sans-serif}header,main,footer{max-width:1200px;margin:auto;padding:20px 24px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #293c40}header b{letter-spacing:.15em}a{color:#efd16c}h1{font-size:clamp(28px,4vw,48px);margin:12px 0}p{line-height:1.6;color:#becbcb}.eyebrow{color:#efd16c;letter-spacing:.15em;font-size:12px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}button,.button{padding:14px 22px;background:#efd16c;color:#102024;border:0;border-radius:5px;font:600 16px system-ui;cursor:pointer;text-decoration:none}.secondary{background:#20383d;color:#f0eedc}#stage{position:relative;aspect-ratio:16/9;background:#050b0d;border:1px solid #31474a;overflow:hidden;border-radius:8px}#stage:fullscreen{width:100vw;height:100vh;border:0;display:flex;align-items:center;justify-content:center}canvas{width:100%;height:100%;display:block;outline:none;object-fit:contain}#cover{position:absolute;inset:0;background:url(portada.png) center/contain no-repeat #091315;display:grid;align-content:end;justify-items:center;padding:20px}#cover.hidden{display:none}#status{background:#091315e8;padding:8px 18px;border-radius:4px;text-align:center}#progress{width:min(360px,80%);accent-color:#efd16c;display:none}#error{color:#ffbdb4;display:none}details{margin:22px 0;background:#102327;padding:16px;border-radius:6px}summary{cursor:pointer;color:#efd16c}.keys{line-height:2}kbd{background:#294046;padding:2px 6px;border-radius:3px;color:white}footer{font-size:12px;color:#91a5a7}button:disabled{opacity:.6;cursor:wait}@media(max-width:600px){header,main,footer{padding:16px}header a{font-size:12px}#stage{border-radius:0}.actions>*{flex:1;text-align:center}.desktop{display:none}}</style></head>
+<body><header><b>YOKO / SE ESCAPÓ</b><a href="https://github.com/odsanchezuniversitaria-web/yoko-se-escapo">Ver proyecto ↗</a></header>
+<main><p class="eyebrow">UNA HISTORIA EN EL SUR DE BOGOTÁ</p><h1>Sigue el rastro. Encuentra a Yimmy.</h1><p>Explora las ruinas con Yoko, descubre mutaciones temporales y decide cómo sobrevivir. Tus decisiones cambian el final.</p>
+<div class="actions"><button id="play">Jugar en navegador</button><a class="button secondary" href="https://github.com/odsanchezuniversitaria-web/yoko-se-escapo/releases/latest/download/Yoko-Android.apk">Descargar Android ↓</a><button class="secondary" id="full">Pantalla completa</button></div>
+<div id="stage"><canvas id="game" width="1600" height="900" tabindex="0" aria-label="Yoko se escapó, juego 2D"></canvas><div id="cover"><progress id="progress" max="1" value="0"></progress><p id="status">Pulsa «Jugar en navegador» para comenzar.</p></div></div><p id="error" role="alert"></p>
+<details open><summary>Cómo jugar</summary><p class="keys"><kbd>A</kbd> / <kbd>D</kbd> o flechas: mover · <kbd>Espacio</kbd>: saltar · <kbd>Shift</kbd>: olfato · <kbd>E</kbd>: explorar / asimilar · <kbd>J</kbd>: atacar · <kbd>Esc</kbd>: pausa.<br>Con mutación de ave, mantén Espacio para planear. Encuentra el suero y después el ave muerta para salir de la base.</p><p>En Android, instala el APK para usar los controles táctiles. Requiere Android 8 o superior y ARM64. La versión web se recomienda en ordenador; usa el dispositivo en horizontal si juegas desde el móvil.</p></details>
+<p>Primera versión jugable · Unity 6000.4.10f1 · Cinco zonas y dos desenlaces. El arte es una adaptación del guion. Android pendiente de prueba en teléfono físico.</p></main>
+<footer>Biblia narrativa: Laura Daniela Rodríguez Bernal, Angie Jasbleidy Fajardo Valbuena y Leidy Yised Estupiñán Salazar.</footer>
+<script>
+const canvas=document.querySelector('#game'),play=document.querySelector('#play'),cover=document.querySelector('#cover'),statusText=document.querySelector('#status'),progress=document.querySelector('#progress');let instance;
+function fail(e){play.disabled=false;play.textContent='Reintentar';const el=document.querySelector('#error');el.style.display='block';el.textContent='No se pudo iniciar el juego. Recarga la página o prueba un navegador con WebGL 2. '+String(e);}
+play.onclick=()=>{if(instance){canvas.focus();return;}play.disabled=true;statusText.textContent='Cargando Yoko…';progress.style.display='block';const script=document.createElement('script');script.src='Build/__LOADER__';script.onerror=()=>fail('Error de descarga.');script.onload=()=>createUnityInstance(canvas,{dataUrl:'Build/__DATA__',frameworkUrl:'Build/__FRAMEWORK__',codeUrl:'Build/__WASM__',streamingAssetsUrl:'StreamingAssets',companyName:'Yoko',productName:'Yoko se escapo',productVersion:'0.1.0',autoSyncPersistentDataPath:true},p=>{progress.value=p;statusText.textContent='Cargando Yoko… '+Math.round(p*100)+'%';}).then(game=>{instance=game;window.yokoInstance=game;cover.classList.add('hidden');play.disabled=false;play.textContent='Volver al juego';canvas.focus();}).catch(fail);document.body.appendChild(script);};
+document.querySelector('#full').onclick=()=>{if(instance)instance.SetFullscreen(1);else document.querySelector('#stage').requestFullscreen?.();};
+canvas.addEventListener('click',()=>canvas.focus());canvas.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();});
+</script></body></html>'''
+for key,value in [('LOADER',loader),('DATA',data),('FRAMEWORK',framework),('WASM',wasm)]:html=html.replace('__'+key+'__',value)
+(site/'index.html').write_text(html,encoding='utf-8')
+print('Web preparada:',[(p.name,p.stat().st_size) for p in (site/'Build').iterdir()])
